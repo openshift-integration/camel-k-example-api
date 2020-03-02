@@ -1,12 +1,33 @@
 ---
-openapi: 3.0.2
+swagger: "2.0"
 info:
-  title: Example API
+  title: My API
   version: 1.0.0
 paths:
-  /:
+  /{name}:
     get:
+      parameters:
+      - name: name
+        description: The name of the file
+        in: path
+        required: true
+        type: string
       responses:
         "200":
-          description: Ok
+          description: The content of the file
+        "404":
+          description: The file has not been found
       operationId: get
+      summary: Returns the content of a given file
+    put:
+      parameters:
+      - name: name
+        description: The name of the file
+        in: path
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Indicates that the file has been created
+      operationId: create
+      summary: Save a file into the bucket
