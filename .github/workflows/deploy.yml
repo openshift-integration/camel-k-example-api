@@ -28,6 +28,7 @@ jobs:
         OPENSHIFT_URL: ${{ secrets.OPENSHIFT_URL }}
       run: |
         oc login -u ${OPENSHIFT_USER} -p ${OPENSHIFT_PASSWORD} --server=${OPENSHIFT_URL} --insecure-skip-tls-verify
+        oc new-project camel-k-api-staging || true
         oc project camel-k-api-staging
 
     - name: Deploy Minio Server
@@ -37,4 +38,5 @@ jobs:
 
     - name: Deploy Integrations
       run: |
+        kamel install
         kamel run test/MinioConfigurer.java API.java -p api.bucket=camel-k --name api --wait
