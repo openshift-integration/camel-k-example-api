@@ -1,0 +1,43 @@
+name: Camel K CI
+
+on:
+  pull_request:
+    branches:
+    - master
+  push:
+    branches:
+    - master
+
+jobs:
+  playground-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Camel K Playground
+      uses: nicolaferraro/camel-k-github-action@v1.0-alpha.1
+      with:
+        cluster: openshift
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Prepare Environment
+      run: |
+        kamel install
+
+        # Yaks install can be simplified with an action
+        curl --silent -L https://github.com/jboss-fuse/yaks/releases/download/v0.0.4/yaks_0.0.4_Linux_x86_64.tar.gz --output yaks.tgz
+        tar zxf yaks.tgz
+        sudo mv yaks /usr/bin/
+        yaks install
+
+    - name: Deploy Minio Server
+      run: |
+        oc apply -f test/minio.yaml
+        oc wait pod --for=condition=ready --timeout=5m -l app=minio
+
+    - name: Deploy Integrations
+      run: |
+        kamel run test/MinioConfigurer.java API.java -p api.bucket=camel-k --name api --wait
+
+    - name: Test Integrations
+      run: |        
+        yaks test test/crud.feature
+        

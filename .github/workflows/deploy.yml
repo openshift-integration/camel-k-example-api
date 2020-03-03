@@ -1,0 +1,35 @@
+name: Camel K Deploy
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v1
+    - name: Setup Camel K Tools
+      uses: nicolaferraro/camel-k-github-action@2baed3211c2ded95681d8efbcbacac9cebc43072
+      with:
+        cluster: none
+    - name: Connect to remote cluster
+      env:
+        OPENSHIFT_USER: ${{ secrets.OPENSHIFT_USER }}
+        OPENSHIFT_PASSWORD: ${{ secrets.OPENSHIFT_PASSWORD }}
+        OPENSHIFT_URL: ${{ secrets.OPENSHIFT_URL }}
+      run: |
+        oc login -u ${OPENSHIFT_USER} -p ${OPENSHIFT_PASSWORD} --server=${OPENSHIFT_URL} --insecure-skip-tls-verify
+        oc project camel-k-api-staging
+        
+    - name: Deploy Minio Server
+      run: |
+        oc apply -f test/minio.yaml
+        oc wait pod --for=condition=ready --timeout=5m -l app=minio
+
+    - name: Deploy Integrations
+      run: |
+        kamel run test/MinioConfigurer.java API.java -p api.bucket=camel-k --name api --wait

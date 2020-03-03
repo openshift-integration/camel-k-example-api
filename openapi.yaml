@@ -1,0 +1,54 @@
+---
+swagger: "2.0"
+info:
+  title: My API
+  version: 1.0.0
+  description: Simple API that wraps an S3 bucket
+paths:
+  /:
+    get:
+      responses:
+        "200":
+          description: List the files
+          schema:
+            type: array
+            items:
+              type: string
+      operationId: list
+  /{name}:
+    get:
+      parameters:
+      - name: name
+        description: The name of the file
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Return the content of the object
+      operationId: get
+      summary: Returns the content of a given object
+    put:
+      parameters:
+      - name: name
+        description: The name of the object
+        in: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Indicates that the object has been created
+      operationId: create
+      summary: Save an object into the bucket
+    delete:
+      parameters:
+      - name: name
+        description: The name of the object
+        in: path
+        required: true
+        type: string
+      responses:
+        "204":
+          description: Object deleted
+      operationId: delete
+
