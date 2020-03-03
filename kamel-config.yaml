@@ -1,0 +1,10 @@
+kamel:
+  run:
+    integration:
+      api:
+        dependencies: '[camel-rest,camel-undertow,camel-jackson]'
+        open-apis: '[openapi.yaml]'
+        profile: OpenShift
+        properties: '[camel.rest.port=8080]'
+        property-files: '[s3.properties]'
+        traits: '[service.auto=false]'

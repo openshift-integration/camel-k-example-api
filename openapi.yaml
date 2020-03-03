@@ -5,6 +5,16 @@ info:
   version: 1.0.0
   description: Simple API that wraps an S3 bucket
 paths:
+  /:
+    get:
+      responses:
+        "200":
+          description: List the files
+          schema:
+            type: array
+            items:
+              type: string
+      operationId: list
   /{name}:
     get:
       parameters:
@@ -16,8 +26,6 @@ paths:
       responses:
         "200":
           description: Return the content of the object
-        "404":
-          description: Object not found
       operationId: get
       summary: Returns the content of a given object
     put:
@@ -40,18 +48,7 @@ paths:
         required: true
         type: string
       responses:
-        "200":
+        "204":
           description: Object deleted
-        "404":
-          description: Object not found
       operationId: delete
-  /:
-    get:
-      responses:
-        "200":
-          description: List the files
-          schema:
-            type: array
-            items:
-              type: string
-      operationId: list
+
