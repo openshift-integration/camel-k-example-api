@@ -10,11 +10,11 @@ public class API extends RouteBuilder {
     // All endpoints starting from "direct:..." reference an operationId defined
     // in the "openapi.yaml" file.
 
-
     // List the object names available in the S3 bucket
     from("direct:list")
       .to("aws-s3://{{api.bucket}}?operation=listObjects")
-      .split(simple("${body.objectSummaries}"), AggregationStrategies.groupedBody())
+      .transform().simple("${body.objectSummaries}")
+      .split(simple("${body}"), AggregationStrategies.groupedBody())
         .transform().simple("${body.key}")
       .end()
       .marshal().json();
