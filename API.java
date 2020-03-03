@@ -31,8 +31,7 @@ public class API extends RouteBuilder {
     // Upload a new object into the S3 bucket
     from("direct:create")
       .setHeader("CamelAwsS3Key", simple("${header.name}"))
-      .to("aws-s3://{{api.bucket}}")
-      .setHeader("CamelHttpResponseCode", constant(201));
+      .to("aws-s3://{{api.bucket}}");
 
 
     // Delete an object from the S3 bucket

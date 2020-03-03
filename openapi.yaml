@@ -36,7 +36,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
+        "200":
           description: Indicates that the object has been created
       operationId: create
       summary: Save an object into the bucket
