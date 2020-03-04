@@ -20,7 +20,8 @@ jobs:
       run: |
         curl --silent -L https://github.com/nicolaferraro/camel-k-github-action/releases/download/v1.0-alpha.1/kamel --output kamel
         chmod a+x kamel
-        mv kamel /home/runner/bin/kamel
+        cp kamel /home/runner/bin/kamel
+        sudo mv kamel /usr/bin/kamel
     - name: Checkout code
       uses: actions/checkout@v1
     - name: Prepare Environment
