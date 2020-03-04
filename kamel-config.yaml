@@ -2,7 +2,5 @@ kamel:
   run:
     integration:
       api:
-        dependencies: '[camel-rest,camel-undertow,camel-jackson,camel-swagger-java]'
+        dependencies: '[camel-rest,camel-undertow,camel-jackson]'
         open-apis: '[openapi.yaml]'
-        properties: '[camel.rest.port=8080]'
-        traits: '[service.auto=false]'
