@@ -147,18 +147,18 @@ To run the integration, you need to link it to the proper configuration, that de
 To connect the integration to the **AWS S3 service**:
 
 ```
-kamel run API.java --property-file s3.properties --openapi openapi.yaml
+kamel run API.java --property-file s3.properties --open-api openapi.yaml
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--openapi%20openapi.yaml&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 ### 4.2 Using the test Minio server
 
 As alternative, to connect the integration to the **test Minio server** deployed before:
 
 ```
-kamel run test/MinioConfigurer.java API.java --openapi openapi.yaml -p api.bucket=camel-k
+kamel run test/MinioConfigurer.java API.java --open-api openapi.yaml -p api.bucket=camel-k
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20test/MinioConfigurer.java%20API.java%20--openapi%20openapi.yaml%20-p%20api.bucket=camel-k&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20test/MinioConfigurer.java%20API.java%20--open-api%20openapi.yaml%20-p%20api.bucket=camel-k&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 
 ## 5. Using the API
