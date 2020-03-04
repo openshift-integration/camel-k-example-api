@@ -38,5 +38,5 @@ jobs:
 
     - name: Deploy Integrations
       run: |
-        kamel install
+        kamel install --force
         kamel run test/MinioConfigurer.java API.java -t service.auto=false -p api.bucket=camel-k -p camel.rest.port=8080 --name api --profile OpenShift --wait
