@@ -1,0 +1,5 @@
+kamel:
+  run:
+    integration:
+      api:
+        dependencies: '[camel-rest,camel-undertow,camel-jackson]'
