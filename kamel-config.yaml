@@ -1,6 +1,0 @@
-kamel:
-  run:
-    integration:
-      api:
-        dependencies: '[camel-rest,camel-undertow,camel-jackson]'
-        open-apis: '[openapi.yaml]'
