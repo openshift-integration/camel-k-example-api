@@ -41,7 +41,7 @@ jobs:
 
     - name: Deploy Integrations
       run: |
-        kamel run test/MinioConfigurer.java API.java --open-api openapi.yaml -t service.auto=false -p api.bucket=camel-k -p camel.rest.port=8080 --name api --profile OpenShift --wait
+        kamel run test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -t service.auto=false -p camel.rest.port=8080 --name api --profile OpenShift --wait
 
     - name: Test Integrations
       run: |        
