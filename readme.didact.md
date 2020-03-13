@@ -156,9 +156,9 @@ kamel run API.java --property-file s3.properties --open-api openapi.yaml
 As alternative, to connect the integration to the **test Minio server** deployed before using the [test/MinioCustomizer.java](didact://?commandId=vscode.open&projectFilePath=test/MinioCustomizer.java "Opens the customizer file"){.didact} class:
 
 ```
-kamel run test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml
+kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20test/MinioCustomizer.java%20API.java%20--property-file%20test/minio.properties%20--open-api%20openapi.yaml&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test/MinioCustomizer.java%20API.java%20--property-file%20test/minio.properties%20--open-api%20openapi.yaml&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 
 ## 5. Using the API
