@@ -23,7 +23,7 @@ jobs:
         cp kamel /home/runner/bin/kamel
         sudo mv kamel /usr/bin/kamel
     - name: Checkout code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Prepare Environment
       run: |
         kamel install --operator-image camelk/camel-k:1.0.0-20200317
