@@ -23,10 +23,10 @@ jobs:
         cp kamel /home/runner/bin/kamel
         sudo mv kamel /usr/bin/kamel
     - name: Checkout code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Prepare Environment
       run: |
-        kamel install
+        kamel install --operator-image camelk/camel-k:1.0.0-20200317
 
         # Yaks install can be simplified with an action
         curl --silent -L https://github.com/jboss-fuse/yaks/releases/download/v0.0.4/yaks_0.0.4_Linux_x86_64.tar.gz --output yaks.tgz
@@ -41,7 +41,7 @@ jobs:
 
     - name: Deploy Integrations
       run: |
-        kamel run test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -t service.auto=false -p camel.rest.port=8080 --name api --profile OpenShift --wait
+        kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java --wait
 
     - name: Test Integrations
       run: |        

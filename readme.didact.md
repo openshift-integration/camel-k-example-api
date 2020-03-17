@@ -78,10 +78,12 @@ oc new-project camel-api
 Upon successful creation, you should ensure that the Camel K operator is installed. We'll use the `kamel` CLI to do it:
 
 ```
-kamel install
+kamel install --trait-profile OpenShift
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20install&completion=Camel%20K%20operator%20installation. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20install%20--trait-profile%20OpenShift&completion=Camel%20K%20operator%20installation. "Opens a new terminal and sends the command above"){.didact})
 
+NOTE: We use the `OpenShift` trait profile to make the quickstart work on plain OpenShift, without Knative features. We'll enable Knative features in the last part
+of the quickstart.
 
 Camel K should have created an IntegrationPlatform custom resource in your project. To verify it:
 
@@ -147,18 +149,18 @@ To run the integration, you need to link it to the proper configuration, that de
 To connect the integration to the **AWS S3 service**:
 
 ```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 ### 4.2 Using the test Minio server
 
 As alternative, to connect the integration to the **test Minio server** deployed before using the [test/MinioCustomizer.java](didact://?commandId=vscode.open&projectFilePath=test/MinioCustomizer.java "Opens the customizer file"){.didact} class:
 
 ```
-kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml
+kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test/MinioCustomizer.java%20API.java%20--property-file%20test/minio.properties%20--open-api%20openapi.yaml&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test/MinioCustomizer.java%20API.java%20--property-file%20test/minio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 
 ## 5. Using the API
@@ -176,8 +178,148 @@ An integration named `api` should be present in the list and it should be in sta
 
 NOTE: it may take some time, the first time you run the integration, for it to reach the `Running` state.
 
-**TO BE CONTINUED with:**
-- OpenAPI test UI
-- 3scale management
+After the integraiton has reached the running state, you can get the route corresponding to it via the following command:
+
+```
+URL=http://$(oc get route api -o jsonpath='{.spec.host}')
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3Dhttp%3A%2F%2F%24%28oc%20get%20route%20api%20-o%20jsonpath%3D%27%7B.spec.host%7D%27%29&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
 
 
+You can print the route to check if it's correct:
+
+```
+echo $URL
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$echo%20$URL&completion=Print%20route. "Opens a new terminal and sends the command above"){.didact})
+
+You can now play with it!
+
+Get the list of objects:
+```
+curl -i $URL/
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20$URL&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+Upload an object:
+```
+curl -i -X PUT --header "Content-Type: application/octet-stream" --data-binary "@API.java" $URL/example
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20-X%20PUT%20--header%20%22Content-Type%3A%20application%2Foctet-stream%22%20--data-binary%20%22%40API.java%22%20%24URL%2Fexample&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+Get the new list of objects:
+```
+curl -i $URL/
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20$URL&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+Get the content of a file:
+```
+curl -i $URL/example
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20%24URL%2Fexample&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+Delete the file:
+```
+curl -i -X DELETE $URL/example
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20-X%20DELETE%20%24URL%2Fexample&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+Get (again) the new list of objects:
+```
+curl -i $URL/
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20$URL&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+
+## 6. Running as Knative service (Optional - Requires Knative)
+
+The API integration can also run as Knative service and be able to scale to zero and scale out automatically, based on the received load.
+
+To expose the integration as Knative service, you need to have OpenShift serverless installed in the cluster.
+
+### 6.1 Using the S3 service
+
+To connect the integration to the **AWS S3 service**:
+
+```
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java --profile Knative
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20--profile%20Knative&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
+### 6.2 Using the test Minio server
+
+As alternative, to connect the integration to the **test Minio server**:
+
+```
+kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java --profile Knative
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20--profile%20Knative&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
+### 6.3 Test the Knative integrations
+
+Now you can check the integrations to see when they are ready:
+
+```
+oc get integrations
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20get%20integrations&completion=Getting%20running%20integrations. "Opens a new terminal and sends the command above"){.didact})
+
+When the `api` integration is ready, you should be able to get a route to invoke it.
+
+```
+URL=$(oc get routes.serving.knative.dev api -o jsonpath='{.status.url}')
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3D%24%28oc%20get%20routes.serving.knative.dev%20api%20-o%20jsonpath%3D%27%7B.status.url%7D%27%29&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
+
+You can print the route to check if it's correct:
+
+```
+echo $URL
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$echo%20$URL&completion=Print%20route. "Opens a new terminal and sends the command above"){.didact})
+
+You can (again) play with it!
+
+Get the list of objects:
+```
+curl -i $URL/
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20$URL&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+Looking at the pods, you should find a pod corresponding to the API integration:
+
+```
+oc get pods
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20get%20pods&completion=Getting%20running%20pods. "Opens a new terminal and sends the command above"){.didact})
+
+If you wait **at least one minute** without invoking the API, you'll find that the pod will disappear.
+Calling the API again will make the pod appear to serve the request.
+
+## 7. Configuring 3Scale (Optional - Requires 3scale)
+
+This optional step allows you to expose the integration in the 3scale API management solution.
+
+Ensure that 3scale is installed and watches the current namespace. We're going to add annotations to the service to allow 3scale to discover the integration 
+and manage it. This process is accomplished via the `3scale` trait in Camel K.
+
+### 7.1 Using the S3 service
+
+To connect the integration to the **AWS S3 service**:
+
+```
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
+### 7.2 Using the test Minio server
+
+As alternative, to connect the integration to the **test Minio server**:
+
+```
+kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
+After the integration is updated, when looking in the 3scale API manager, you should find the new service.
