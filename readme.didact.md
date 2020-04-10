@@ -100,9 +100,6 @@ oc project camel-api
 
 We should now check that the operator is installed. To do so, execute the following command on a terminal:
 
-
-Upon successful creation, you should ensure that the Camel K operator is installed. We'll use the `kamel` CLI to do it:
-
 ```
 oc get csv
 ```
