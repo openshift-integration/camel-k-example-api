@@ -85,8 +85,6 @@ You can install it from the VS Code Extensions marketplace.
 *Status: unknown*{#extension-requirement-status}
 
 
-## 1. Preparing a new OpenShift project
-
 ## 1. Preparing the project
 
 We'll connect to the `camel-api` project and check the installation status.
