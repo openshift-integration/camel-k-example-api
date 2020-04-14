@@ -18,22 +18,29 @@ Make sure you check-out this repository from git and open it with [VSCode](https
 Instructions are based on [VSCode Didact](https://github.com/redhat-developer/vscode-didact), so make sure it's installed
 from the VSCode extensions marketplace.
 
-From the VSCode UI, click on the `readme.didact.md` file and select "Didact: Start Didact tutorial from File". A new Didact tab will be opened in VS Code.
+From the VSCode UI, right-click on the `readme.didact.md` file and select "Didact: Start Didact tutorial from File". A new Didact tab will be opened in VS Code.
+
+Make sure you've opened this readme file with Didact before jumping to the next section.
+
+## Preparing the cluster
+
+This example can be run on any OpenShift 4.3+ cluster or a local development instance (such as [CRC](https://github.com/code-ready/crc)). Ensure that you have a cluster available and login to it using the OpenShift `oc` command line tool.
+
+You need to create a new project named `camel-api` for running this example. This can be done directly from the OpenShift web console or by executing the command `oc new-project camel-api` on a terminal window.
+
+You need to install the Camel K operator in the `camel-api` project. To do so, go to the OpenShift 4.x web console, login with a cluster admin account and use the OperatorHub menu item on the left to find and install **"Red Hat Integration - Camel K"**. You will be given the option to install it globally on the cluster or on a specific namespace.
+If using a specific namespace, make sure you select the `camel-api` project from the dropdown list.
+This completes the installation of the Camel K operator (it may take a couple of minutes).
+
+When the operator is installed, from the OpenShift Help menu ("?") at the top of the WebConsole, you can access the "Command Line Tools" page, where you can download the **"kamel"** CLI, that is required for running this example. The CLI must be installed in your system path.
+
+Refer to the **"Red Hat Integration - Camel K"** documentation for a more detailed explanation of the installation steps for the operator and the CLI.
+
+You can use the following section to check if your environment is configured properly.
 
 ## Checking requirements
 
 <a href='didact://?commandId=vscode.didact.validateAllRequirements' title='Validate all requirements!'><button>Validate all Requirements at Once!</button></a>
-
-**VS Code Extension Pack for Apache Camel**
-
-The VS Code Extension Pack for Apache Camel by Red Hat provides a collection of useful tools for Apache Camel K developers,
-such as code completion and integrated lifecycle management.
-
-You can install it from the VS Code Extensions marketplace.
-
-[Check if the VS Code Extension Pack for Apache Camel by Red Hat is installed](didact://?commandId=vscode.didact.extensionRequirementCheck&text=extension-requirement-status$$redhat.apache-camel-extension-pack&completion=Camel%20extension%20pack%20is%20available%20on%20this%20system. "Checks the VS Code workspace to make sure the extension pack is installed"){.didact}
-
-*Status: unknown*{#extension-requirement-status}
 
 **OpenShift CLI ("oc")**
 
@@ -61,26 +68,51 @@ access all Camel K features.
 
 *Status: unknown*{#kamel-requirements-status}
 
+### Optional Requirements
 
-## 1. Preparing a new OpenShift project
+The following requirements are optional. They don't prevent the execution of the demo, but may make it easier to follow.
 
-We'll setup a new project called `camel-api` where we'll run the integrations.
+**VS Code Extension Pack for Apache Camel**
 
-To create the project, open a terminal tab and type the following command:
+The VS Code Extension Pack for Apache Camel by Red Hat provides a collection of useful tools for Apache Camel K developers,
+such as code completion and integrated lifecycle management. They are **recommended** for the tutorial, but they are **not**
+required.
+
+You can install it from the VS Code Extensions marketplace.
+
+[Check if the VS Code Extension Pack for Apache Camel by Red Hat is installed](didact://?commandId=vscode.didact.extensionRequirementCheck&text=extension-requirement-status$$redhat.apache-camel-extension-pack&completion=Camel%20extension%20pack%20is%20available%20on%20this%20system. "Checks the VS Code workspace to make sure the extension pack is installed"){.didact}
+
+*Status: unknown*{#extension-requirement-status}
+
+
+## 1. Preparing the project
+
+We'll connect to the `camel-api` project and check the installation status.
+
+To change project, open a terminal tab and type the following command:
 
 
 ```
-oc new-project camel-api
+oc project camel-api
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20new-project%20camel-api&completion=New%20project%20creation. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20project%20camel-api&completion=New%20project%20creation. "Opens a new terminal and sends the command above"){.didact})
 
 
-Upon successful creation, you should ensure that the Camel K operator is installed. We'll use the `kamel` CLI to do it:
+We should now check that the operator is installed. To do so, execute the following command on a terminal:
 
 ```
-kamel install --trait-profile OpenShift
+oc get csv
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20install%20--trait-profile%20OpenShift&completion=Camel%20K%20operator%20installation. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20get%20csv&completion=Checking%20Cluster%20Service%20Versions. "Opens a new terminal and sends the command above"){.didact})
+
+When Camel K is installed, you should find an entry related to `red-hat-camel-k-operator` in phase `Succeeded`.
+
+After successful installation, we'll configure an `IntegrationPlatform` with default settings using the following command:
+
+```
+kamel install --trait-profile=OpenShift --olm=false --skip-cluster-setup --skip-operator-setup
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20install%20--trait-profile%20OpenShift%20--olm=false%20--skip-cluster-setup%20--skip-operator-setup&completion=Camel%20K%20IntegrationPlatform%20creation. "Opens a new terminal and sends the command above"){.didact})
 
 NOTE: We use the `OpenShift` trait profile to make the quickstart work on plain OpenShift, without Knative features. We'll enable Knative features in the last part
 of the quickstart.
@@ -101,7 +133,7 @@ operator to being installed).
 You have two alternative options for setting up the S3 backend that will be used to store the objects via the Camel K API: 
 you can use an existing S3 bucket of your own or you can set up a local S3 compatible object storage.
 
-### 2.1 I don't have a S3 bucket: let's install a Minio backend
+### 2.1 [Alternative 1] I don't have a S3 bucket: let's install a Minio backend
 
 The `test` directory contains an all-in-one configuration file for creating a Minio backend that will provide a S3 compatible protocol
 for storing the objects.
@@ -117,7 +149,7 @@ oc apply -f test/minio.yaml
 
 That's enough to have a test object storage to use with the API integration.
 
-### 2.1 I have a S3 bucket
+### 2.1 [Alternative 2] I have a S3 bucket
 
 If you have a S3 bucket and you want to use it instead of the test backend, you can do it. The only 
 things that you need to provide are a **AWS Access Key ID and Secret** that you can obtain from the Amazon AWS console.
@@ -144,16 +176,7 @@ This has been implemented in the [API.java](didact://?commandId=vscode.open&proj
 
 To run the integration, you need to link it to the proper configuration, that depends on what configuration you've chosen.
 
-### 4.1 Using the S3 service
-
-To connect the integration to the **AWS S3 service**:
-
-```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
-
-### 4.2 Using the test Minio server
+### 4.1 [Alternative 1] Using the test Minio server
 
 As alternative, to connect the integration to the **test Minio server** deployed before using the [test/MinioCustomizer.java](didact://?commandId=vscode.open&projectFilePath=test/MinioCustomizer.java "Opens the customizer file"){.didact} class:
 
@@ -161,6 +184,15 @@ As alternative, to connect the integration to the **test Minio server** deployed
 kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java
 ```
 ([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test/MinioCustomizer.java%20API.java%20--property-file%20test/minio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
+### 4.2 [Alternative 2] Using the S3 service
+
+To connect the integration to the **AWS S3 service**:
+
+```
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 
 ## 5. Using the API
@@ -238,16 +270,9 @@ The API integration can also run as Knative service and be able to scale to zero
 
 To expose the integration as Knative service, you need to have OpenShift serverless installed in the cluster.
 
-### 6.1 Using the S3 service
 
-To connect the integration to the **AWS S3 service**:
 
-```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java --profile Knative
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20--profile%20Knative&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
-
-### 6.2 Using the test Minio server
+### 6.1 [Alternative 1] Using the test Minio server
 
 As alternative, to connect the integration to the **test Minio server**:
 
@@ -255,6 +280,15 @@ As alternative, to connect the integration to the **test Minio server**:
 kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java --profile Knative
 ```
 ([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20--profile%20Knative&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
+### 6.2 [Alternative 2] Using the S3 service
+
+To connect the integration to the **AWS S3 service**:
+
+```
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java --profile Knative
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20--profile%20Knative&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 ### 6.3 Test the Knative integrations
 
@@ -304,22 +338,23 @@ This optional step allows you to expose the integration in the 3scale API manage
 Ensure that 3scale is installed and watches the current namespace. We're going to add annotations to the service to allow 3scale to discover the integration 
 and manage it. This process is accomplished via the `3scale` trait in Camel K.
 
-### 7.1 Using the S3 service
-
-To connect the integration to the **AWS S3 service**:
-
-```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
-
-### 7.2 Using the test Minio server
+### 7.1 [Alternative 1] Using the test Minio server
 
 As alternative, to connect the integration to the **test Minio server**:
 
 ```
-kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true
+kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true --profile OpenShift
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
+### 7.2 [Alternative 2] Using the S3 service
+
+To connect the integration to the **AWS S3 service**:
+
+```
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true --profile OpenShift
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+
 
 After the integration is updated, when looking in the 3scale API manager, you should find the new service.
