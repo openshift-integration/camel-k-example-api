@@ -358,3 +358,11 @@ kamel run API.java --property-file s3.properties --open-api openapi.yaml -d came
 
 
 After the integration is updated, when looking in the 3scale API manager, you should find the new service.
+
+## 8. Uninstall
+
+To cleanup everything, execute the following command:
+
+```oc delete project camel-api```
+
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20delete%20project%20camel-api&completion=Removed%20the%20project%20from%20the%20cluster. "Cleans up the cluster after running the example"){.didact})
