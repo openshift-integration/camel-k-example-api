@@ -3,47 +3,118 @@ name: Camel K CI
 on:
   pull_request:
     branches:
-    - master
+      - master
   push:
     branches:
-    - master
+      - master
 
 jobs:
   playground-test:
+
     runs-on: ubuntu-latest
+
     steps:
-    - name: Setup Camel K Playground
-      uses: nicolaferraro/camel-k-github-action@v1.0-alpha.1
-      with:
-        cluster: openshift
-    - name: Patch kamel
-      run: |
-        curl --silent -L https://github.com/nicolaferraro/camel-k-github-action/releases/download/v1.0-alpha.1/kamel --output kamel
-        chmod a+x kamel
-        cp kamel /home/runner/bin/kamel
-        sudo mv kamel /usr/bin/kamel
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Prepare Environment
+    - name: Cleanup
       run: |
-        kamel install --operator-image camelk/camel-k:1.0.0-20200317
+        ls -lart
+        echo "Initial status:"
+        df -h
 
-        # Yaks install can be simplified with an action
-        curl --silent -L https://github.com/jboss-fuse/yaks/releases/download/v0.0.4/yaks_0.0.4_Linux_x86_64.tar.gz --output yaks.tgz
-        tar zxf yaks.tgz
-        sudo mv yaks /usr/bin/
-        yaks install
+        echo "Cleaning up resources:"
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo apt clean
+        docker rmi $(docker image ls -aq)
 
-    - name: Deploy Minio Server
+        echo "Final status:"
+        df -h
+    - name: Get Camel K
       run: |
-        oc apply -f test/minio.yaml
-        oc wait pod --for=condition=ready --timeout=5m -l app=minio
-
-    - name: Deploy Integrations
+        export CAMEL_K_VERSION=1.0.0-nightly.202004171040
+        curl -L https://github.com/apache/camel-k/releases/download/${CAMEL_K_VERSION}/camel-k-client-${CAMEL_K_VERSION}-linux-64bit.tar.gz -o camel-k-client.tar.gz
+        tar -zxf camel-k-client.tar.gz
+        sudo mv kamel /usr/local/bin/
+    - name: Get YAKS
       run: |
-        kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java --wait
+        export YAKS_VERSION=0.0.31
+        curl -L https://github.com/citrusframework/yaks/releases/download/v${YAKS_VERSION}/yaks_${YAKS_VERSION}_Linux_x86_64.tar.gz -o yaks.tar.gz
+        tar -zxf yaks.tar.gz
+        sudo mv yaks /usr/local/bin/
+    - name: Get OpenShift Client (oc)
+      run: |
+        export OPENSHIFT_VERSION=v3.11.0
+        export OPENSHIFT_COMMIT=0cbc58b
+        export MAVEN_OPTS=-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
-    - name: Test Integrations
-      run: |        
-        yaks test test/crud.feature
-        
+        # set docker0 to promiscuous mode
+        sudo ip link set docker0 promisc on
+
+        # Download and install the oc binary
+        sudo mount --make-shared /
+
+        sudo apt-get install resolvconf
+        echo "nameserver 8.8.8.8" | sudo tee /etc/resolvconf/resolv.conf.d/head > /dev/null
+        echo "nameserver 8.8.4.4" | sudo tee /etc/resolvconf/resolv.conf.d/head > /dev/null
+        sudo service resolvconf restart
+
+        sudo service docker stop
+        sudo echo '{"insecure-registries": ["172.30.0.0/16"]}' | sudo tee /etc/docker/daemon.json > /dev/null
+        sudo service docker start
+
+        DOWNLOAD_URL=https://github.com/openshift/origin/releases/download/$OPENSHIFT_VERSION/openshift-origin-client-tools-$OPENSHIFT_VERSION-$OPENSHIFT_COMMIT-linux-64bit.tar.gz
+        wget -O client.tar.gz ${DOWNLOAD_URL}
+        tar xvzOf client.tar.gz > oc.bin
+        sudo mv oc.bin /usr/local/bin/oc
+        sudo chmod 755 /usr/local/bin/oc
+
+    - name: Start OpenShift Cluster
+      run: |
+        # Figure out this host's IP address
+        IP_ADDR="$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)"
+
+        # Setup cluster dir
+        sudo mkdir -p /home/runner/lib/oc
+        sudo chmod 777 /home/runner/lib/oc
+        cd /home/runner/lib/oc
+
+        # Start OpenShift
+        oc cluster up --public-hostname=$IP_ADDR --enable=persistent-volumes,registry,router
+        oc login -u system:admin
+
+        # Wait until we have a ready node in openshift
+        TIMEOUT=0
+        TIMEOUT_COUNT=60
+        until [ $TIMEOUT -eq $TIMEOUT_COUNT ]; do
+          if [ -n "$(oc get nodes | grep Ready)" ]; then
+            break
+          fi
+          echo "openshift is not up yet"
+          TIMEOUT=$((TIMEOUT+1))
+          sleep 5
+        done
+
+        if [ $TIMEOUT -eq $TIMEOUT_COUNT ]; then
+          echo "Failed to start openshift"
+          exit 1
+        fi
+
+        echo "openshift is deployed and reachable"
+
+    - name: Info
+      run: |
+        oc describe nodes
+    - name: Prepare IT
+      run: |
+        # Installing Camel K cluster resources
+        kamel install --cluster-setup
+        # Installing YAKS cluster resources
+        yaks install --cluster-setup
+    - name: Run IT
+      run: |
+        # Make the Apache Snapshots repository enabled by efault
+        export KAMEL_INSTALL_MAVEN_REPOSITORIES=https://repository.apache.org/content/repositories/snapshots@id=apache-snapshots@snapshots
+
+        # Run integration tests
+        yaks test test/
