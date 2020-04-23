@@ -15,6 +15,7 @@ Feature: the API allows CRUD operations on a S3 bucket
   Scenario: SAVE object
     Given variable objectName is "citrus:randomString(10)"
     Given variable sampleText is "This is a sample text"
+    Given HTTP request header Content-Type is "application/octet-stream"
     Given HTTP request body
       """
       ${sampleText}
@@ -34,6 +35,7 @@ Feature: the API allows CRUD operations on a S3 bucket
       """
       ${sampleText}
       """
+    Given HTTP request header Content-Type is "application/octet-stream"
     Given send PUT /${objectName}
     Given receive HTTP 200 OK
     When send GET /${objectName}
@@ -51,6 +53,7 @@ Feature: the API allows CRUD operations on a S3 bucket
       """
       ${sampleText}
       """
+    Given HTTP request header Content-Type is "application/octet-stream"
     Given send PUT /${objectName}
     Given receive HTTP 200 OK
     When send DELETE /${objectName}
