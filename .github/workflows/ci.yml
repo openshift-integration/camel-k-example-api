@@ -13,6 +13,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        execution: ["1", "2", "3", "4", "5"]
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -112,7 +116,10 @@ jobs:
         # Installing YAKS cluster resources
         yaks install --cluster-setup
     - name: Run IT
+      env:
+        EXECUTION: ${{ matrix.execution }}
       run: |
+        echo "Run #${EXECUTION}.."
         # Make the Apache Snapshots repository enabled by efault
         export KAMEL_INSTALL_MAVEN_REPOSITORIES=https://repository.apache.org/content/repositories/snapshots@id=apache-snapshots@snapshots
 

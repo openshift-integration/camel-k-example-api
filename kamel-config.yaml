@@ -1,0 +1,6 @@
+kamel:
+  run:
+    integration:
+      api:
+        # Enable probes by default on the API container
+        traits: '[container.probes-enabled=true]'
