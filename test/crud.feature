@@ -58,3 +58,8 @@ Feature: the API allows CRUD operations on a S3 bucket
     Given receive HTTP 200 OK
     When send DELETE /${objectName}
     Then receive HTTP 204 OK
+
+
+  Scenario: expose OpenAPI
+    When send PUT /openapi.json
+    Then receive HTTP 200 OK
