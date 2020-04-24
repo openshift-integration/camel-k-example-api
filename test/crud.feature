@@ -61,5 +61,5 @@ Feature: the API allows CRUD operations on a S3 bucket
 
 
   Scenario: expose OpenAPI
-    When send PUT /openapi.json
+    When send GET /openapi.json
     Then receive HTTP 200 OK
