@@ -343,18 +343,18 @@ and manage it. This process is accomplished via the `3scale` trait in Camel K.
 As alternative, to connect the integration to the **test Minio server**:
 
 ```
-kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true --profile OpenShift
+kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20-t%203scale.description-path%3D%2Fopenapi.json%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 ### 7.2 [Alternative 2] Using the S3 service
 
 To connect the integration to the **AWS S3 service**:
 
 ```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true --profile OpenShift
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20-t%203scale.description-path%3D%2Fopenapi.json%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 
 After the integration is updated, when looking in the 3scale API manager, you should find the new service.
