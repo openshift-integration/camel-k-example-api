@@ -3,7 +3,7 @@ Feature: the API allows CRUD operations on a S3 bucket
 
   Background:
     Given integration api is running
-    Given URL: http://api
+    Given URL: http://api.${YAKS_NAMESPACE}.svc.cluster.local
 
 
   Scenario: LIST objects
