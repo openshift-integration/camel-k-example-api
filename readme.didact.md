@@ -1,15 +1,14 @@
-# Camel K API Example
+# Camel K Serverless API Example
  
 ![Camel K CI](https://github.com/openshift-integration/camel-k-example-api/workflows/Camel%20K%20CI/badge.svg)
 
 This example demonstrates how to write an API based Camel K integration, from the design of the OpenAPI definition 
-to the implementation of the specific endpoints.
+to the implementation of the specific endpoints up to the deployment as serverless API in **Knative**.
 
 In this specific example, the API enables users to store generic objects, such as files, in a backend system, allowing all CRUD operation on them.
 
 The backend is an Amazon AWS S3 bucket that you might provide. In alternative, you'll be given instructions on how to 
 create a simple [Minio](https://min.io/) backend, which uses a S3 compatible protocol.
-
 
 ## Before you begin
 
@@ -21,6 +20,18 @@ from the VSCode extensions marketplace.
 From the VSCode UI, right-click on the `readme.didact.md` file and select "Didact: Start Didact tutorial from File". A new Didact tab will be opened in VS Code.
 
 Make sure you've opened this readme file with Didact before jumping to the next section.
+
+### Installing OpenShift Serverless
+
+This demo also needs OpenShift Serverless (Knative) installed and working.
+
+Go to the OpenShift 4.x WebConsole page, use the OperatorHub menu item on the left hand side then find and install **"OpenShift Serverless"** 
+from a channel that best matches your OpenShift version.
+
+The operator installation page reports links to the documentation where you can find information about **additional steps** that must
+be done in order to have OpenShift serverless completely installed into your cluster.
+
+Make sure you follow all the steps in the documentation before continuing to the next section.
 
 ## Preparing the cluster
 
@@ -68,6 +79,14 @@ access all Camel K features.
 
 *Status: unknown*{#kamel-requirements-status}
 
+**Knative installed on the cluster**
+
+The cluster also needs to have Knative installed and working. Refer to steps above for information on how to install it in your cluster.
+
+[Check if the Knative is installed](didact://?commandId=vscode.didact.requirementCheck&text=kservice-project-check$$kubectl%20api-resources%20--api-group=serving.knative.dev$$kservice%2Cksvc&completion=Verified%20Knative%20services%20installation. "Verifies if Knative is installed"){.didact}
+
+*Status: unknown*{#kservice-project-check}
+
 ### Optional Requirements
 
 The following requirements are optional. They don't prevent the execution of the demo, but may make it easier to follow.
@@ -107,26 +126,7 @@ oc get csv
 
 When Camel K is installed, you should find an entry related to `red-hat-camel-k-operator` in phase `Succeeded`.
 
-After successful installation, we'll configure an `IntegrationPlatform` with default settings using the following command:
-
-```
-kamel install --trait-profile=OpenShift --olm=false --skip-cluster-setup --skip-operator-setup
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20install%20--trait-profile%20OpenShift%20--olm=false%20--skip-cluster-setup%20--skip-operator-setup&completion=Camel%20K%20IntegrationPlatform%20creation. "Opens a new terminal and sends the command above"){.didact})
-
-NOTE: We use the `OpenShift` trait profile to make the quickstart work on plain OpenShift, without Knative features. We'll enable Knative features in the last part
-of the quickstart.
-
-Camel K should have created an IntegrationPlatform custom resource in your project. To verify it:
-
-```
-oc get integrationplatform
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20get%20integrationplatform&completion=Camel%20K%20integration%20platform%20verification. "Opens a new terminal and sends the command above"){.didact})
-
-If everything is ok, you should see an IntegrationPlatform named `camel-k` with phase `Ready` (it can take some time for the 
-operator to being installed).
-
+You can now proceed to the next section.
 
 ## 2. Configuring the object storage backend
 
@@ -213,10 +213,9 @@ NOTE: it may take some time, the first time you run the integration, for it to r
 After the integraiton has reached the running state, you can get the route corresponding to it via the following command:
 
 ```
-URL=http://$(oc get route api -o jsonpath='{.spec.host}')
+URL=$(oc get routes.serving.knative.dev api -o jsonpath='{.status.url}')
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3Dhttp%3A%2F%2F%24%28oc%20get%20route%20api%20-o%20jsonpath%3D%27%7B.spec.host%7D%27%29&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
-
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3D%24%28oc%20get%20routes.serving.knative.dev%20api%20-o%20jsonpath%3D%27%7B.status.url%7D%27%29&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
 
 You can print the route to check if it's correct:
 
@@ -264,64 +263,16 @@ curl -i $URL/
 ([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20$URL&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
 
 
-## 6. Running as Knative service (Optional - Requires Knative)
+## 6 Check the serverless behavior
 
-The API integration can also run as Knative service and be able to scale to zero and scale out automatically, based on the received load.
+Let's try to get the list of objects:
 
-To expose the integration as Knative service, you need to have OpenShift serverless installed in the cluster.
-
-
-
-### 6.1 [Alternative 1] Using the test Minio server
-
-As alternative, to connect the integration to the **test Minio server**:
-
-```
-kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java --profile Knative
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20--profile%20Knative&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
-
-### 6.2 [Alternative 2] Using the S3 service
-
-To connect the integration to the **AWS S3 service**:
-
-```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java --profile Knative
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20--profile%20Knative&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
-
-### 6.3 Test the Knative integrations
-
-Now you can check the integrations to see when they are ready:
-
-```
-oc get integrations
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20get%20integrations&completion=Getting%20running%20integrations. "Opens a new terminal and sends the command above"){.didact})
-
-When the `api` integration is ready, you should be able to get a route to invoke it.
-
-```
-URL=$(oc get routes.serving.knative.dev api -o jsonpath='{.status.url}')
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3D%24%28oc%20get%20routes.serving.knative.dev%20api%20-o%20jsonpath%3D%27%7B.status.url%7D%27%29&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
-
-You can print the route to check if it's correct:
-
-```
-echo $URL
-```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$echo%20$URL&completion=Print%20route. "Opens a new terminal and sends the command above"){.didact})
-
-You can (again) play with it!
-
-Get the list of objects:
 ```
 curl -i $URL/
 ```
 ([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20$URL&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
 
-Looking at the pods, you should find a pod corresponding to the API integration:
+After a successful reply, looking at the pods, you should find a pod corresponding to the API integration:
 
 ```
 oc get pods
@@ -329,7 +280,15 @@ oc get pods
 ([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$oc%20get%20pods&completion=Getting%20running%20pods. "Opens a new terminal and sends the command above"){.didact})
 
 If you wait **at least one minute** without invoking the API, you'll find that the pod will disappear.
-Calling the API again will make the pod appear to serve the request.
+
+Calling the API again, a new pod will be created to service your request:
+
+```
+curl -i $URL/
+```
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$curl%20-i%20$URL&completion=Use%20the%20API. "Opens a new terminal and sends the command above"){.didact})
+
+Check again the list of pods. A new pod has been created and it will be again destroyed in 1 minute if no new requests arrive.
 
 ## 7. Configuring 3Scale (Optional - Requires 3scale)
 

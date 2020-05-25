@@ -3,7 +3,9 @@ Feature: the API allows CRUD operations on a S3 bucket
 
   Background:
     Given integration api is running
-    Given URL: http://api
+    Given URL: http://api.${YAKS_NAMESPACE}.svc.cluster.local
+    Given HTTP request timeout is 60000 ms
+    And wait for GET on path /
 
 
   Scenario: LIST objects
