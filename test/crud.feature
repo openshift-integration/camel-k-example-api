@@ -5,11 +5,11 @@ Feature: the API allows CRUD operations on a S3 bucket
     Given integration api is running
     Given URL: http://api.${YAKS_NAMESPACE}.svc.cluster.local
     Given HTTP request timeout is 60000 ms
-    And wait for GET on path /
+    And wait for GET on path /v1
 
 
   Scenario: LIST objects
-    When send GET /
+    When send GET /v1
     Then verify HTTP response header Content-Type="application/json"
     And receive HTTP 200 OK
 
@@ -22,7 +22,7 @@ Feature: the API allows CRUD operations on a S3 bucket
       """
       ${sampleText}
       """
-    When send PUT /${objectName}
+    When send PUT /v1/${objectName}
     Then receive HTTP 200 OK
     Then verify HTTP response body
       """
@@ -38,9 +38,9 @@ Feature: the API allows CRUD operations on a S3 bucket
       ${sampleText}
       """
     Given HTTP request header Content-Type is "application/octet-stream"
-    Given send PUT /${objectName}
+    Given send PUT /v1/${objectName}
     Given receive HTTP 200 OK
-    When send GET /${objectName}
+    When send GET /v1/${objectName}
     Then receive HTTP 200 OK
     Then verify HTTP response body
       """
@@ -56,9 +56,9 @@ Feature: the API allows CRUD operations on a S3 bucket
       ${sampleText}
       """
     Given HTTP request header Content-Type is "application/octet-stream"
-    Given send PUT /${objectName}
+    Given send PUT /v1/${objectName}
     Given receive HTTP 200 OK
-    When send DELETE /${objectName}
+    When send DELETE /v1/${objectName}
     Then receive HTTP 204 OK
 
 

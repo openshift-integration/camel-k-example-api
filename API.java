@@ -1,4 +1,4 @@
-// camel-k: language=java dependency=camel-openapi-java
+// camel-k: language=java dependency=camel-quarkus-openapi-java 
 
 import org.apache.camel.builder.AggregationStrategies;
 import org.apache.camel.builder.RouteBuilder;
