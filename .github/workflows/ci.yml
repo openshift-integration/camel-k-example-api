@@ -36,8 +36,8 @@ jobs:
         df -h
     - name: Get Camel K
       run: |
-        export CAMEL_K_VERSION=1.0.0-nightly.202005130003
-        curl -L https://github.com/apache/camel-k/releases/download/${CAMEL_K_VERSION}/camel-k-client-${CAMEL_K_VERSION}-linux-64bit.tar.gz -o camel-k-client.tar.gz
+        export CAMEL_K_VERSION=1.2.0
+        curl -L https://github.com/apache/camel-k/releases/download/v${CAMEL_K_VERSION}/camel-k-client-${CAMEL_K_VERSION}-linux-64bit.tar.gz -o camel-k-client.tar.gz
         tar -zxf camel-k-client.tar.gz
         sudo mv kamel /usr/local/bin/
     - name: Get YAKS
