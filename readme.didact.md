@@ -178,21 +178,21 @@ To run the integration, you need to link it to the proper configuration, that de
 
 ### 4.1 [Alternative 1] Using the test Minio server
 
-As alternative, to connect the integration to the **test Minio server** deployed before using the [test/MinioCustomizer.java](didact://?commandId=vscode.open&projectFilePath=test/MinioCustomizer.java "Opens the customizer file"){.didact} class:
+As alternative, to connect the integration to the **test Minio server** deployed before:
 
 ```
-kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java
+kamel run API.java --open-api openapi.yaml --property-file test/minio.properties 
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test/MinioCustomizer.java%20API.java%20--property-file%20test/minio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--open-api%20openapi.yaml%20--property-file%20test/minio.properties&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 ### 4.2 [Alternative 2] Using the S3 service
 
 To connect the integration to the **AWS S3 service**:
 
 ```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java
+kamel run API.java --open-api openapi.yaml --property-file s3.properties 
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--open-api%20openapi.yaml%20--property-file%20s3.properties&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 
 ## 5. Using the API
@@ -213,7 +213,7 @@ NOTE: it may take some time, the first time you run the integration, for it to r
 After the integraiton has reached the running state, you can get the route corresponding to it via the following command:
 
 ```
-URL=$(oc get routes.serving.knative.dev api -o jsonpath='{.status.url}')
+URL=$(oc get routes.serving.knative.dev api -o jsonpath='{.status.url}')/v1
 ```
 ([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3D%24%28oc%20get%20routes.serving.knative.dev%20api%20-o%20jsonpath%3D%27%7B.status.url%7D%27%29&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
 
@@ -302,18 +302,18 @@ and manage it. This process is accomplished via the `3scale` trait in Camel K.
 As alternative, to connect the integration to the **test Minio server**:
 
 ```
-kamel run --name api test/MinioCustomizer.java API.java --property-file test/minio.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
+kamel run API.java --property-file test/minio.properties --open-api openapi.yaml -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20--name%20api%20test%2FMinioCustomizer.java%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20-t%203scale.description-path%3D%2Fopenapi.json%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20test%2Fminio.properties%20--open-api%20openapi.yaml%20-t%203scale.enabled%3Dtrue%20-t%203scale.description-path%3D%2Fopenapi.json%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 ### 7.2 [Alternative 2] Using the S3 service
 
 To connect the integration to the **AWS S3 service**:
 
 ```
-kamel run API.java --property-file s3.properties --open-api openapi.yaml -d camel-openapi-java -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
+kamel run API.java --property-file s3.properties --open-api openapi.yaml -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-d%20camel-openapi-java%20-t%203scale.enabled%3Dtrue%20-t%203scale.description-path%3D%2Fopenapi.json%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$kamel%20run%20API.java%20--property-file%20s3.properties%20--open-api%20openapi.yaml%20-t%203scale.enabled%3Dtrue%20-t%203scale.description-path%3D%2Fopenapi.json%20--profile%20OpenShift&completion=Integration%20run. "Opens a new terminal and sends the command above"){.didact})
 
 
 After the integration is updated, when looking in the 3scale API manager, you should find the new service.

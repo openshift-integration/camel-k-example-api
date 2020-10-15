@@ -5,7 +5,7 @@ info:
   version: 1.0.0
   description: A CRUD API for an object store
 paths:
-  /:
+  /v1:
     get:
       responses:
         "200":
@@ -18,7 +18,7 @@ paths:
           description: Object list
       operationId: list
       summary: List the objects
-  /{name}:
+  /v1/{name}:
     get:
       responses:
         "200":
