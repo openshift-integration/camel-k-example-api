@@ -36,14 +36,14 @@ jobs:
         df -h
     - name: Get Camel K
       run: |
-        export CAMEL_K_VERSION=1.2.0
+        export CAMEL_K_VERSION=1.3.0
         curl -L https://github.com/apache/camel-k/releases/download/v${CAMEL_K_VERSION}/camel-k-client-${CAMEL_K_VERSION}-linux-64bit.tar.gz -o camel-k-client.tar.gz
         tar -zxf camel-k-client.tar.gz
         sudo mv kamel /usr/local/bin/
     - name: Get YAKS
       run: |
-        export YAKS_VERSION=0.0.45
-        curl -L https://github.com/citrusframework/yaks/releases/download/v${YAKS_VERSION}/yaks_${YAKS_VERSION}_Linux_x86_64.tar.gz -o yaks.tar.gz
+        export YAKS_VERSION=0.1.0
+        curl -L https://github.com/citrusframework/yaks/releases/download/v${YAKS_VERSION}/yaks-${YAKS_VERSION}-linux-64bit.tar.gz -o yaks.tar.gz
         tar -zxf yaks.tar.gz
         sudo mv yaks /usr/local/bin/
     - name: Get OpenShift Client (oc)
