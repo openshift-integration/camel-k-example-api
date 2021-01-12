@@ -23,11 +23,11 @@ Feature: the API allows CRUD operations on a S3 bucket
       ${sampleText}
       """
     When send PUT /v1/${objectName}
-    Then receive HTTP 200 OK
     Then verify HTTP response body
       """
       ${sampleText}
       """
+    Then receive HTTP 200 OK
 
 
   Scenario: GET object
@@ -41,12 +41,12 @@ Feature: the API allows CRUD operations on a S3 bucket
     Given send PUT /v1/${objectName}
     Given receive HTTP 200 OK
     When send GET /v1/${objectName}
-    Then receive HTTP 200 OK
     Then verify HTTP response body
       """
       ${sampleText}
       """
-  
+    Then receive HTTP 200 OK
+
 
   Scenario: DELETE object
     Given variable objectName is "citrus:randomString(10)"
