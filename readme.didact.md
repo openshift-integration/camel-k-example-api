@@ -215,7 +215,7 @@ After the integraiton has reached the running state, you can get the route corre
 ```
 URL=$(oc get routes.serving.knative.dev api -o jsonpath='{.status.url}')/v1
 ```
-([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3D%24%28oc%20get%20routes.serving.knative.dev%20api%20-o%20jsonpath%3D%27%7B.status.url%7D%27%29&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
+([^ execute](didact://?commandId=vscode.didact.sendNamedTerminalAString&text=camelTerm$$URL%3D%24%28oc%20get%20routes.serving.knative.dev%20api%20-o%20jsonpath%3D%27%7B.status.url%7D%27%29%2Fv1&completion=Getting%20route. "Opens a new terminal and sends the command above"){.didact})
 
 You can print the route to check if it's correct:
 
