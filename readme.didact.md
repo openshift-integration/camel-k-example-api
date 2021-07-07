@@ -1,6 +1,4 @@
 # Camel K Serverless API Example
- 
-![Camel K CI](https://github.com/openshift-integration/camel-k-example-api/workflows/Camel%20K%20CI/badge.svg)
 
 This example demonstrates how to write an API based Camel K integration, from the design of the OpenAPI definition 
 to the implementation of the specific endpoints up to the deployment as serverless API in **Knative**.
