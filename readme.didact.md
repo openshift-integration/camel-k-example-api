@@ -152,7 +152,7 @@ That's enough to have a test object storage to use with the API integration.
 If you have a S3 bucket and you want to use it instead of the test backend, you can do it. The only 
 things that you need to provide are a **AWS Access Key ID and Secret** that you can obtain from the Amazon AWS console.
 
-Edit the ([s3.properties](didact://?commandId=vscode.open&projectFilePath=s3.properties "Opens the S3 configuration"){.didact}) to set the right value for the properties `camel.component.aws-s3.access-key` and `camel.component.aws-s3.secret-key`.
+Edit the ([s3.properties](didact://?commandId=vscode.open&projectFilePath=s3.properties "Opens the S3 configuration"){.didact}) to set the right value for the properties `camel.component.aws2-s3.region`, `camel.component.aws-s3.access-key` and `camel.component.aws-s3.secret-key`.
 Those properties will be automatically injected into the Camel `aw3-s3` component.
 
 ## 3. Designing the API
