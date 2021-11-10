@@ -1,14 +1,20 @@
 config:
-  namespace:
-    temporary: true
+  runtime:
+    env:
+      - name: YAKS_CAMELK_AUTO_REMOVE_RESOURCES
+        value: false
+      - name: YAKS_KUBERNETES_AUTO_REMOVE_RESOURCES
+        value: false
+      - name: YAKS_CAMELK_SUPPORT_VARIABLES_IN_SOURCES
+        value: false
+    resources:
+      - ../API.java
+      - ../openapi.yaml
+      - minio.yaml
+      - minio.properties
 pre:
-- name: minio installation
-  run: |
-    oc apply -f minio.yaml -n ${YAKS_NAMESPACE}
-    oc wait pod -l app=minio --for condition=Ready -n ${YAKS_NAMESPACE} --timeout=5m
-
-- name: integration
-  run: |
-    kamel install -w -n ${YAKS_NAMESPACE}
-
-    kamel run --name api ../API.java --property-file minio.properties --open-api ../openapi.yaml -w -n ${YAKS_NAMESPACE}
+  - name: RBAC setup
+    if: env:CI=true
+    run: |
+      yaks role --add infra/role-minio.yaml
+      yaks role --add infra/role-binding-minio.yaml

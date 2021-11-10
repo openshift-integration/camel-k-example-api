@@ -2,8 +2,14 @@
 
 .project
 .metadata
+.classpath
+.settings
 
 *.iml
 /.idea
 
-/_output
+# Test output folder
+_output/
+
+# Dependency library folder for IDE setup
+lib/
