@@ -9,14 +9,14 @@ Feature: Service API allows CRUD operations on S3 bucket
     Then wait for Kubernetes pod labeled with app=minio
 
   Scenario: Create transformations integration
-    Given Camel-K resource polling configuration
+    Given Camel K resource polling configuration
       | maxAttempts          | 200   |
       | delayBetweenAttempts | 2000  |
-    Given Camel-K integration property file minio.properties
-    When load Camel-K integration API.java with configuration
+    Given Camel K integration property file minio.properties
+    When load Camel K integration API.java with configuration
       | openapi      | openapi.yaml |
       | dependencies | camel:openapi-java |
-    Then Camel-K integration api should be running
+    Then Camel K integration api should be running
     And wait for GET on path /v1
 
   Scenario: LIST objects
@@ -75,6 +75,6 @@ Feature: Service API allows CRUD operations on S3 bucket
     Then expect HTTP response body loaded from openapi.yaml
     Then receive HTTP 200 OK
 
-  Scenario: Remove Camel-K integrations
-    Given delete Camel-K integration api
+  Scenario: Remove Camel K integrations
+    Given delete Camel K integration api
     And delete Kubernetes resource minio.yaml

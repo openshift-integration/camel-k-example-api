@@ -12,9 +12,18 @@ config:
       - ../openapi.yaml
       - minio.yaml
       - minio.properties
+  dump:
+    enabled: true
+    failedOnly: true
+    includes:
+      - app=camel-k
 pre:
   - name: RBAC setup
     if: env:CI=true
     run: |
       yaks role --add infra/role-minio.yaml
       yaks role --add infra/role-binding-minio.yaml
+post:
+  - name: print dump
+    if: env:CI=true && failure()
+    run: kamel dump
