@@ -12,11 +12,15 @@ Feature: Service API allows CRUD operations on S3 bucket
     Given Camel K resource polling configuration
       | maxAttempts          | 200   |
       | delayBetweenAttempts | 2000  |
+    Given variables
+      | minio.service.host | yaks:serviceClusterIp('minio') |
+      | minio.service.port | 9000 |
     Given Camel K integration property file minio.properties
     When load Camel K integration API.java with configuration
-      | openapi      | openapi.yaml |
+      | traits       | openapi.configmaps=[openapi] |
       | dependencies | camel:openapi-java |
     Then Camel K integration api should be running
+    And Camel K integration api should print Listening on:
     And wait for GET on path /v1
 
   Scenario: LIST objects

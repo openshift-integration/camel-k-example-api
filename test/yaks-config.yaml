@@ -29,7 +29,13 @@ pre:
     run: |
       yaks role --add infra/role-minio.yaml
       yaks role --add infra/role-binding-minio.yaml
+  - name: Create OpenAPI config map
+    run: |
+      kubectl create configmap openapi --from-file=../openapi.yaml
 post:
+  - name: Delete OpenAPI config map
+    run: |
+      kubectl delete configmap openapi
   - name: print dump
     if: env:CI=true && failure()
     run: kamel dump
