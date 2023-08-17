@@ -23,24 +23,26 @@ on:
       - main
       - 1.6.x
       - 1.8.x
+      - 1.10.x
   push:
     branches:
       - main
       - 1.6.x
       - 1.8.x
+      - 1.10.x
 
 jobs:
   test:
     runs-on: ubuntu-latest
     env:
       CAMEL_K_VERSION: latest
-      YAKS_VERSION: 0.10.0
+      YAKS_VERSION: 0.15.1
       YAKS_IMAGE_NAME: "docker.io/citrusframework/yaks"
       YAKS_RUN_OPTIONS: "--timeout=15m"
       KUBECTL_WAIT_TIMEOUT: "180s"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Cleanup
         run: |
           ls -lart
@@ -59,22 +61,23 @@ jobs:
 
           echo "Final status:"
           df -h
-      - name: Set up JDK 11
-        uses: AdoptOpenJDK/install-jdk@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          version: "11"
+          java-version: '11'
+          distribution: 'temurin'
       - name: Kind Cluster
         uses: container-tools/kind-action@v1
         with:
-          version: v0.11.0
-          node_image: kindest/node:v1.21.1@sha256:fae9a58f17f18f06aeac9772ca8b5ac680ebbed985e266f711d936e91d113bad
+          version: v0.14.0
+          node_image: kindest/node:v1.23.6@sha256:b1fa224cc6c7ff32455e0b1fd9cbfd3d3bc87ecaa8fcb06961ed1afb3db0f9ae
       - name: Info
         run: |
           kubectl version
           kubectl cluster-info
           kubectl describe nodes
       - name: Camel K Tools
-        uses: container-tools/camel-k-action@v1
+        uses: container-tools/camel-k-action@v1.0.3
         with:
           version: ${{ env.CAMEL_K_VERSION }}
       - name: Install Camel K
