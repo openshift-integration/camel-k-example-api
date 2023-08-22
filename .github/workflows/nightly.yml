@@ -152,7 +152,7 @@ jobs:
       - name: Camel K Tools
         uses: container-tools/camel-k-action@v1.0.3
         with:
-          version: v${{ matrix.version }}
+          version: ${{ matrix.version }}
       - name: Install Camel K
         run: |
           # Configure install options
