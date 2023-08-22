@@ -131,30 +131,39 @@ It contains operations for:
 
 The file can be edited manually or better using an online editor, such as [Apicurio](https://studio.apicur.io/).
 
-## 4. Running the API integration
+## 4. Create ConfigMap with OpenAPI
+Simply execute the following command on a terminal:
+```
+oc create configmap openapi --from-file=openapi.yaml
+```
+Verify that ConfigMap was created by executing:
+```
+oc get cm | grep openapi
+```
+## 5. Running the API integration
 
 The endpoints defined in the API can be implemented in a Camel K integration using a `direct:<operationId>` endpoint.
 This has been implemented in the `API.java` file.
 
 To run the integration, you need to link it to the proper configuration, that depends on what configuration you've chosen.
 
-### 4.1 [Alternative 1] Using the test Minio server
+### 5.1 [Alternative 1] Using the test Minio server
 
 As alternative, to connect the integration to the **test Minio server** deployed before:
 
 ```
-kamel run API.java --open-api file:openapi.yaml --property file:test/minio.properties 
+kamel run API.java --open-api configmap:openapi --property file:test/minio.properties
 ```
 
-### 4.2 [Alternative 2] Using the S3 service
+### 5.2 [Alternative 2] Using the S3 service
 
 To connect the integration to the **AWS S3 service**:
 
 ```
-kamel run API.java --open-api file:openapi.yaml --property file:s3.properties 
+kamel run API.java --open-api configmap:openapi --property file:s3.properties
 ```
 
-## 5. Using the API
+## 6. Using the API
 
 After running the integration API, you should be able to call the API endpoints to check its behavior.
 
@@ -184,40 +193,40 @@ You can now play with it!
 
 Get the list of objects:
 ```
-curl -i $URL/
+curl -i -k $URL/
 ```
 
 Upload an object:
 ```
-curl -i -X PUT --header "Content-Type: application/octet-stream" --data-binary "@API.java" $URL/example
+curl -i -k -X PUT --header "Content-Type: application/octet-stream" --data-binary "@API.java" $URL/example
 ```
 
 Get the new list of objects:
 ```
-curl -i $URL/
+curl -i -k $URL/
 ```
 
 Get the content of a file:
 ```
-curl -i $URL/example
+curl -i -k $URL/example
 ```
 
 Delete the file:
 ```
-curl -i -X DELETE $URL/example
+curl -i -k -X DELETE $URL/example
 ```
 
 Get (again) the new list of objects:
 ```
-curl -i $URL/
+curl -i -k $URL/
 ```
 
-## 6 Check the serverless behavior
+## 7 Check the serverless behavior
 
 Let's try to get the list of objects:
 
 ```
-curl -i $URL/
+curl -i -k $URL/
 ```
 
 After a successful reply, looking at the pods, you should find a pod corresponding to the API integration:
@@ -231,37 +240,37 @@ If you wait **at least one minute** without invoking the API, you'll find that t
 Calling the API again, a new pod will be created to service your request:
 
 ```
-curl -i $URL/
+curl -i -k $URL/
 ```
 
 Check again the list of pods. A new pod has been created, and it will be again destroyed in 1 minute if no new requests arrive.
 
-## 7. Configuring 3Scale (Optional - Requires 3scale)
+## 8. Configuring 3Scale (Optional - Requires 3scale)
 
 This optional step allows you to expose the integration in the 3scale API management solution.
 
 Ensure that 3scale is installed and watches the current namespace. We're going to add annotations to the service to allow 3scale to discover the integration
 and manage it. This process is accomplished via the `3scale` trait in Camel K.
 
-### 7.1 [Alternative 1] Using the test Minio server
+### 8.1 [Alternative 1] Using the test Minio server
 
 As alternative, to connect the integration to the **test Minio server**:
 
 ```
-kamel run API.java --property file:test/minio.properties --open-api file:openapi.yaml -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
+kamel run API.java --property file:test/minio.properties --open-api configmap:openapi -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
 ```
 
-### 7.2 [Alternative 2] Using the S3 service
+### 8.2 [Alternative 2] Using the S3 service
 
 To connect the integration to the **AWS S3 service**:
 
 ```
-kamel run API.java --property file:s3.properties --open-api file:openapi.yaml -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
+kamel run API.java --property file:s3.properties --open-api configmap:openapi -t 3scale.enabled=true -t 3scale.description-path=/openapi.json --profile OpenShift
 ```
 
 After the integration is updated, when looking in the 3scale API manager, you should find the new service.
 
-## 8. Uninstall
+## 9. Uninstall
 
 To clean up everything, execute the following command:
 
