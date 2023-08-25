@@ -24,13 +24,14 @@ on:
       - 1.6.x
       - 1.8.x
       - 1.10.x
+      - 2.0.x
   push:
     branches:
       - main
       - 1.6.x
       - 1.8.x
       - 1.10.x
-
+      - 2.0.x
 jobs:
   test:
     runs-on: ubuntu-latest
