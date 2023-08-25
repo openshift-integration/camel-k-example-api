@@ -105,7 +105,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - latest
+          - 2.0.0
     runs-on: ubuntu-latest
     env:
       YAKS_VERSION: "0.16.0-202308211440"
@@ -150,7 +150,7 @@ jobs:
       - name: Camel K Tools
         uses: container-tools/camel-k-action@v1.0.3
         with:
-          version: ${{ matrix.version }}
+          version: v${{ matrix.version }}
       - name: Install Camel K
         run: |
           # Configure install options
