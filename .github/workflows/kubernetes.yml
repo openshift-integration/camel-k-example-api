@@ -39,6 +39,7 @@ jobs:
       YAKS_VERSION: 0.15.1
       YAKS_IMAGE_NAME: "docker.io/citrusframework/yaks"
       YAKS_RUN_OPTIONS: "--timeout=15m"
+      KUBECTL_WAIT_TIMEOUT: "180s"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -87,6 +88,9 @@ jobs:
           export KAMEL_INSTALL_REGISTRY_INSECURE=true
 
           kamel install
+          
+          # Wait for operator to start
+          kubectl wait pod -l app=camel-k --for condition=Ready --timeout=${{ env.KUBECTL_WAIT_TIMEOUT }}
       - name: YAKS tools
         uses: citrusframework/yaks-install-action@v1.1
         with:
@@ -94,6 +98,9 @@ jobs:
       - name: Install YAKS
         run: |
           yaks install --operator-image $YAKS_IMAGE_NAME:$YAKS_VERSION
+          
+          # Wait for operator to start
+          kubectl wait pod -l app=yaks --for condition=Ready --timeout=${{ env.KUBECTL_WAIT_TIMEOUT }}
       - name: YAKS Tests
         run: |
           # Then run integration tests
